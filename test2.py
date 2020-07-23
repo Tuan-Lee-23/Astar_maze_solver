@@ -7,12 +7,35 @@ class Node():
         self.parent = parent # Node
         self.position = position # list
 
-        self.f = 0
+        self.g = 0  # Distance from starting point (from parent)
+        self.h = 0  # Distance from end point
+        self.f = 0  # Sum: g + h
+
 
     def update_distance(self, start, end):
-        g = euclidean_distance(self.position, start.position)
-        h = euclidean_distance(self.position, end.position)
-        self.f = g + h
+        self.h = euclidean_distance(self.position, end.position)
+
+        # If parent's node is not None
+        if self.parent != None:
+            print("parent: ", self.parent.position)
+            dist_with_parent = euclidean_distance(self.position, self.parent.position)
+
+            if self.g > self.parent.g + dist_with_parent:
+                print("Self.g > self.parent: ", self.g, self.parent.g, ' + ', dist_with_parent)
+                self.g = self.parent.g + dist_with_parent
+            else:
+                self.g = dist_with_parent
+
+        # If parent's node is None
+        else:
+            self.g = euclidean_distance(self.position, start.position)
+
+        # g += parent.g recursively
+        print("h(x) = ", self.position, ": ", self.h)
+        print("g(x) = ", self.position, ": ", self.g, end = "\n\n")
+
+
+        self.f = self.g + self.h
 
 # Create test maze
 testMaze = [[0, 0, 0, 0, 0],
@@ -53,35 +76,35 @@ def get_adjacent_indices(current, maze):
 
     # up left
     if i > 0 and j > 0:
-        adjacent_indices.append((i - 1, j - 1))
+        adjacent_indices.append([i - 1, j - 1])
 
     # Up
     if i > 0:
-        adjacent_indices.append((i-1,j))
+        adjacent_indices.append([i-1,j])
     
     # up right
     if i > 0 and j + 1 < n:
-        adjacent_indices.append((i - 1, j + 1))
+        adjacent_indices.append([i - 1, j + 1])
 
     # right
     if j + 1 < n:
-        adjacent_indices.append((i,j+1))
+        adjacent_indices.append([i,j+1])
     
     # down right
     if j + 1 < n and i + 1 < m:
-        adjacent_indices.append((i + 1, j + 1))
+        adjacent_indices.append([i + 1, j + 1])
     
     # down
     if i + 1 < m:
-        adjacent_indices.append((i+1,j))
+        adjacent_indices.append([i+1,j])
 
     # down left
     if j > 0 and i + 1 < m:
-        adjacent_indices.append((i + 1, j - 1))
+        adjacent_indices.append([i + 1, j - 1])
 
     # left
     if j > 0:
-        adjacent_indices.append((i,j-1))
+        adjacent_indices.append([i,j-1])
 
     return adjacent_indices
 
@@ -99,30 +122,48 @@ def AStar_pathfinding(maze, start, goal):
     open_set.append(start)
 
 
-    # test
-    test1 = Node(None, [0, 0])
-    test2 = Node(None, [3, 3])
-
-    start = Node(None, [0, 0])
-    goal = Node(None, [3, 3])
-
-    test1.update_distance(start, goal)
-    print(test1.f)
-    # test
-
     while True:
+        # Get current = node in open with lowest f cost
         smallest_node = open_set[0]
         for node in open_set:
             if node.f < smallest_node.f:
                 smallest_node = node
         
         current = smallest_node
-        
-        if current.position == goal:
+
+        # Update f cost of current
+        current.update_distance(start, goal)
+
+        # If current is goal return
+        if current.position == goal.position:
             return 
         
-    
-    
+
+        # Get neighbors of current
+        indices = current.position
+        neighbors = get_adjacent_indices(indices, maze.shape)
+        
+
+        neighbors_nodes = [Node(current, neighbor) for neighbor in neighbors]
+
+        # Update distance of neighbor
+        for neighbor in neighbors_nodes:
+            neighbor.parent = current
+            print("Current: ", current.position)
+            print("Neighbor: ", neighbor.position)
+            neighbor.update_distance(start, goal)
+
+        for neighbor in neighbors_nodes:
+            # remove neighbor which is an obstacle
+            if neighbor.position in obstacle or neighbor in close_set:
+                continue
+            
+            if neighbor not in open_set:
+                current = neighbor.parent
+
+                if neighbor not in open_set:
+                    open_set.append(neighbor)
+
 
 
     
