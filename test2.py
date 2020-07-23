@@ -17,11 +17,10 @@ class Node():
 
         # If parent's node is not None
         if self.parent != None:
-            print("parent: ", self.parent.position)
+            # print("parent: ", self.parent.position)
             dist_with_parent = euclidean_distance(self.position, self.parent.position)
 
             if self.g > self.parent.g + dist_with_parent:
-                print("Self.g > self.parent: ", self.g, self.parent.g, ' + ', dist_with_parent)
                 self.g = self.parent.g + dist_with_parent
             else:
                 self.g = dist_with_parent
@@ -38,8 +37,8 @@ class Node():
         self.f = self.g + self.h
 
 # Create test maze
-testMaze = [[0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
+testMaze = [[1, 0, 0, 0, 0],
+            [1, 1, 1, 1, 0],
             [0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0]]
@@ -108,43 +107,76 @@ def get_adjacent_indices(current, maze):
 
     return adjacent_indices
 
+def make_obstacles_list(maze):
+    result = np.where(maze == 1)
+
+    return list(map(list, zip(result[0], result[1])))
+    
+
 
 def AStar_pathfinding(maze, start, goal):
     open_set = [] # set of nodes to be evaluated
     close_set = [] # set of nodes already evaluated
-    obstacle = []
+
+    traversed = []
+
+    obstacle = make_obstacles_list(maze)
 
     start = Node(None, start)
     goal = Node(None, goal)
 
-    traversed_node = []
 
     open_set.append(start)
 
-
     while True:
+        print("close set: ")
+        [print(x.position) for x in close_set]
         # Get current = node in open with lowest f cost
         smallest_node = open_set[0]
+        # print("open now: ", [x.position for x in open_set])
         for node in open_set:
-            if node.f < smallest_node.f:
+            if node.f < smallest_node.f and node.position not in obstacle:
                 smallest_node = node
-        
+        print("SMallest node: -----------", smallest_node.position)
+
         current = smallest_node
+
+
+        traversed.append(current.position)
+        try:
+            open_set.remove(current)
+        except ValueError:
+            pass
+
 
         # Update f cost of current
         current.update_distance(start, goal)
+        close_set.append(current)
 
         # If current is goal return
         if current.position == goal.position:
-            return 
+            print("open set: ")
+            [print(x.position) for x in open_set]
+            print("\n\n\n")
+            print("close set: ")
+            [print(x.position) for x in close_set]
+            return [open_set, close_set]
         
 
         # Get neighbors of current
         indices = current.position
         neighbors = get_adjacent_indices(indices, maze.shape)
         
+        #test
+        neighbors = [x for x in neighbors if x not in obstacle]
+        #test 
+        print("Obstacle: ", obstacle)
+        print("Neighbor hop le: ", neighbors)
+        #test
 
         neighbors_nodes = [Node(current, neighbor) for neighbor in neighbors]
+        
+        print("Open: ", [x.position for x in open_set])
 
         # Update distance of neighbor
         for neighbor in neighbors_nodes:
@@ -155,21 +187,23 @@ def AStar_pathfinding(maze, start, goal):
 
         for neighbor in neighbors_nodes:
             # remove neighbor which is an obstacle
-            if neighbor.position in obstacle or neighbor in close_set:
+            if neighbor.position in obstacle or neighbor in close_set or neighbor.position in traversed:
+                print("ping")
                 continue
             
-            if neighbor not in open_set:
+            open_set_position = [x.position for x in open_set]
+            if neighbor.position not in open_set_position:
+                print(neighbor.position, " not in ", [x.position for x in open_set])
+                #test
+                #test
                 current = neighbor.parent
 
-                if neighbor not in open_set:
-                    open_set.append(neighbor)
-
-
+                open_set.append(neighbor)
 
     
 
-start_pos = [0, 0]
-goal_pos = [4, 4]
+start_pos = [3, 4]
+goal_pos = [0, 1]
 
 AStar_pathfinding(testMaze, start_pos, goal_pos)
 
