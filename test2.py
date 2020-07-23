@@ -7,9 +7,12 @@ class Node():
         self.parent = parent # Node
         self.position = position # list
 
-        self.g = 0
-        self.h = 0
-        self.f = self.g + self.h
+        self.f = 0
+
+    def update_distance(self, start, end):
+        g = euclidean_distance(self.position, start.position)
+        h = euclidean_distance(self.position, end.position)
+        self.f = g + h
 
 # Create test maze
 testMaze = [[0, 0, 0, 0, 0],
@@ -21,11 +24,6 @@ testMaze = [[0, 0, 0, 0, 0],
 
 testMaze = np.array(testMaze)
 
-start_pos = [3, 3]
-goal_pos = [0, 1]
-
-testMaze[start_pos[0], start_pos[1]] = -5
-testMaze[goal_pos[0], goal_pos[1]] = 5
 
 print(testMaze)
 
@@ -44,7 +42,6 @@ def euclidean_distance(start_pos: list, goal_pos: list):
 
     return distance
 
-print(euclidean_distance(start_pos, goal_pos))
 
 
 
@@ -102,50 +99,36 @@ def AStar_pathfinding(maze, start, goal):
     open_set.append(start)
 
 
+    # test
+    test1 = Node(None, [0, 0])
+    test2 = Node(None, [3, 3])
 
-    # Frontier structure:  [[positionX, positionY], f_cost]
+    start = Node(None, [0, 0])
+    goal = Node(None, [3, 3])
 
-    # test set
-    target = [[3, 3], 0]
-    test = [[[1, 1], 30], [[0, 1], 10], [[1, 0], 10]]
-    open_set = test
-    #test set
+    test1.update_distance(start, goal)
+    print(test1.f)
+    # test
 
-    # Find node in open_set with lowest f_cost
-    smallest = open_set[0][1]
-    indexes = 0
-    
-    for x in test:
-        if x[1] < smallest:
-            smallest = x[1]
-            indexes = test.index(x)
-
-    # current = node in open_set with the lowest f_cost
-    current = test[indexes]
-
-    # remove current from open_set
-    open_set.remove(current)
-
-    # add current to close_set
-    close_set.append(current)
-
-    # if current is the target node
-    if current[0] == target:
-        return
-    
-    print('current: ', current)
-
-    neighbors =  get_adjacent_indices(current[0], [4, 4])
-    
-    for neighbor in neighbors:
-        print(neighbor)
-        if neighbor in obstacle or neighbor in close_set:
-            continue
+    while True:
+        smallest_node = open_set[0]
+        for node in open_set:
+            if node.f < smallest_node.f:
+                smallest_node = node
         
-        if euclidean_distance(current, neighbor) < current[1] or neighbor not in open_set:
-            neighbor.f = eucli
+        current = smallest_node
+        
+        if current.position == goal:
+            return 
+        
+    
+    
 
 
+    
+
+start_pos = [0, 0]
+goal_pos = [4, 4]
 
 AStar_pathfinding(testMaze, start_pos, goal_pos)
 
