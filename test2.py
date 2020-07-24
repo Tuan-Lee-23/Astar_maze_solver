@@ -25,16 +25,29 @@ class Node():
             else:
                 self.g = dist_with_parent
 
+                # test
+                dist = 0
+                temp = self 
+                print("BINGINBINGING")
+                while temp.parent is not None:
+                    print(temp.position, ': ', temp.g)
+                    dist = dist + temp.g
+                    temp = temp.parent
+                print("Total g: ", dist)
+                self.g = dist
+                # test
+
         # If parent's node is None
         else:
             self.g = euclidean_distance(self.position, start.position)
 
         # g += parent.g recursively
-        print("h(x) = ", self.position, ": ", self.h)
-        print("g(x) = ", self.position, ": ", self.g, end = "\n\n")
-
-
         self.f = self.g + self.h
+        print("h(x) = ", self.position, ": ", self.h)
+        print("g(x) = ", self.position, ": ", self.g)
+        print("f(x) = ", self.f, end = '\n\n\n')
+
+
 
 # Create test maze
 testMaze = [[1, 0, 0, 0, 0],
@@ -129,14 +142,18 @@ def AStar_pathfinding(maze, start, goal):
     open_set.append(start)
 
     while True:
-        print("close set: ")
-        [print(x.position) for x in close_set]
+
         # Get current = node in open with lowest f cost
         smallest_node = open_set[0]
+        print("starting: ", open_set[0].position)
         # print("open now: ", [x.position for x in open_set])
         for node in open_set:
+            # test
+            print(node.position, ": ", node.f, " < ", smallest_node.f)
+            # test
             if node.f < smallest_node.f and node.position not in obstacle:
                 smallest_node = node
+                print("smallest now: ", smallest_node.f)
         print("SMallest node: -----------", smallest_node.position)
 
         current = smallest_node
@@ -196,9 +213,12 @@ def AStar_pathfinding(maze, start, goal):
                 print(neighbor.position, " not in ", [x.position for x in open_set])
                 #test
                 #test
+                print("adding neighbor", neighbor.position)
                 current = neighbor.parent
 
+
                 open_set.append(neighbor)
+                print("open list now: ", [x.position for x in open_set], end = "\n\n")
 
     
 
