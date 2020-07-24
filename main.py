@@ -173,6 +173,7 @@ def AStar_pathfinding(maze, start, goal):
                 current = current.parent
             print(path[::-1])
             print("done")
+            print("close ", [x.position for x in close_set])
             return
         
         # Generate children of current node
@@ -185,7 +186,7 @@ def AStar_pathfinding(maze, start, goal):
             print("Child: ", child.position, "---------------------")
 
             # Child is on the close_set
-            if child in close_set or child.position in obstacle or child.position in traversed:
+            if child.position in close_set or child.position in obstacle or child.position in traversed:
                 continue
             
             # if child not in open_set:
