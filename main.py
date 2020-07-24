@@ -143,7 +143,7 @@ def AStar_pathfinding(maze, start, goal):
         print("Current: ", current.position, "------------------------------------")
 
         # test if current has been in traversed
-        if current.position in traversed and current.position != start.position:
+        if current in close_set:
             print("Current: ", current.position, " in traversed")
             open_set.remove(current)
             close_set.append(current)
@@ -178,7 +178,7 @@ def AStar_pathfinding(maze, start, goal):
         
         # Generate children of current node
         children = get_adjacent_indices(current.position, maze.shape)
-        print("Children: ", children)
+        # print("Children: ", children)
 
         children_nodes = [Node(current, child) for child in children]
 
@@ -186,7 +186,7 @@ def AStar_pathfinding(maze, start, goal):
             print("Child: ", child.position, "---------------------")
 
             # Child is on the close_set
-            if child.position in close_set or child.position in obstacle or child.position in traversed:
+            if child in close_set or child.position in obstacle or child.position in traversed:
                 continue
             
             # if child not in open_set:
