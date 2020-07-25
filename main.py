@@ -1,4 +1,5 @@
-import numpy as np
+import numpy as np 
+import sys
 
 class Node():
     def __init__(self, parent = None, position = None):
@@ -55,11 +56,13 @@ def euclidean_distance(start_pos: list, goal_pos: list):
 
     return distance
 
-
+# TODO: get adjacent nodes from current node
+# @input: current (Node), maze_shape (list)
+#         current: current node,    maze: shape of maze (m, n)
 
 # Get neighbor of current node
-def get_adjacent_indices(current, maze):
-    m, n = maze[0], maze[1]
+def get_adjacent_indices(current, maze_shape):
+    m, n = maze_shape[0], maze_shape[1]
     i, j = current[0], current[1]
     adjacent_indices = []
 
@@ -107,8 +110,8 @@ def make_obstacles_list(maze):
 # TODO: use A* algorithm to find optimal path in maze
 # @input: maze (numpy array), start (list), goal (list)
 # @output: 
-    # if goal is reached:    return [path, traversed]
-    #                       path: optimal ưay to finish a maze
+    # if goal is reached:    return [path (list), traversed (list)]
+    #                       path: optimal path to finish a maze
     #                       traversed: all of nodes have opened
 
     # if can't reach the goal position:     return [[-1], traversed]
@@ -230,7 +233,11 @@ def AStar_pathfinding(maze, start, goal):
 
 # TODO: draw maze as text with optimal path
 # @input: maze (list), start: start position, goal: goal position
-# @output: numpy array
+# if solver can reach goal position
+#       @output: maze (numpy array), path (list)
+#                                    path: optimal solution path
+# if solver can't reach goal 
+#       @output: ['-1'] (list)
 def draw_optimal_path(maze, start, goal):
 
     # convert maze into numpy array
@@ -264,6 +271,7 @@ def draw_optimal_path(maze, start, goal):
         
         # Add free cells as "-"
         maze[maze == "0"] = "-"
+        print("\n\nSymbolize maze: \n")
         print(maze)
 
         print("\n\nOptimal path ----------- ")
@@ -281,26 +289,73 @@ def draw_optimal_path(maze, start, goal):
 
         
 # TODO: read maze file and return matrix
+# If file not found, exit and throw error
 # @input: file dir
-# @output: numpy array
+# @output: [maze, start, goal]
+#           maze: map in matrix (numpy array)
+#           start: start position (list)
+#           end: end position (list)
+
 def read_input_file(dir: str):
-    pass
+
+    try:
+        with open(dir, 'r') as f:
+            lines = f.readlines()
+
+            maze = np.array([[]])
+            
+            for i, line in enumerate(lines):
+                
+                if i == 0:
+                    maze_shape = line.strip()
+                    maze_shape = [int(maze_shape[0]), int(maze_shape[2])]
+
+                elif i == 1:
+                    start = line.strip()
+                    start = [int(start[0]), int(start[2])]
+
+                elif i == 2:
+                    goal = line.strip()
+                    goal = [int(goal[0]), int(goal[2])]
+
+                else:
+                    row = line.strip()
+                    row = row.split()
+                    row = np.array(row).astype('int')
+                    maze = np.append(maze, row)
+
+            maze = maze.reshape(maze_shape)
+            maze = maze.astype('int')
+
+            print("Shape: ", maze_shape)
+            print("Start: ", start)
+            print("Goal: ", goal)
+
+            print("Maze read as input: ")
+            
+            print(maze)
+
+            return [maze, start, goal]
+    except FileNotFoundError:
+        print("File not found:", dir, "\nplease fix your directory")
+        sys.exit(1)
 
 
-
+# TODO: receive maze and make output file 
+# @input: dir: string, maze (list), start (list), goal (list)
+# @output: a text file
 def make_output (dir, maze, start, goal):
     with open(dir, 'w') as f:
-
         result = draw_optimal_path(maze, start, goal)
 
-
+        # If optimal path is not found
         if result == ['-1']:
             f.write('-1')
             f.close()
 
             return
     
-
+        # Found
         else:
             
             num_of_steps = len(result[1])
@@ -329,16 +384,27 @@ def make_output (dir, maze, start, goal):
             f.close()
 
 
-        
+
+def main():
+
+    input_data = read_input_file('input.txt')
 
 
-# print(AStar_pathfinding(testMaze, [3, 4], [0, 1]))
-# AStar_pathfinding(testMaze, [0, 0], [9, 9])
+
+    # Maze
+    maze = input_data[0]
+    start = input_data[1]
+    goal = input_data[2]
 
 
-# result = draw_optimal_path(testMaze, [3, 4], [0, 1])
+    make_output('output.txt', maze, start, goal)
 
-make_output("output.txt", testMaze, [3, 4], [0, 1])
+
+if __name__ == '__main__':
+    main()
+
+
+
 
 
 
