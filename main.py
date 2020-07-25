@@ -115,6 +115,7 @@ def AStar_pathfinding(maze, start, goal):
 
     obstacle = make_obstacles_list(maze)
 
+    # Create start node and goal node
     start = Node(None, start)
     start.f = 0
     goal = Node(None, goal)
@@ -139,17 +140,10 @@ def AStar_pathfinding(maze, start, goal):
         current = smallest
         # print("Current: ", current.position, "------------------------------------")
 
-        # # test if current has been in traversed
-        # if current.position in traversed:
-        #     print("Current: ", current.position, " in traversed")
-        #     open_set.remove(current)
-        #     continue
-        # # test
-        # else:
 
         # Add current node to traversed
         traversed.append(current.position)
-        #test 
+
         # print("Traversed: ", traversed)
 
 
@@ -180,7 +174,7 @@ def AStar_pathfinding(maze, start, goal):
         for child in children_nodes:
             # print("Child: ", child.position, "---------------------")
 
-            # TODO: Child is on the traversed
+            # TODO: continue if Child is on the traversed
             if child.position in obstacle or child.position in traversed:
                 continue
 
