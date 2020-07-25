@@ -19,7 +19,7 @@ testMaze = [[1, 0, 0, 0, 0],
             [0, 0, 0, 0, 0]]
 
 testMaze = [[0, 0, 0, 0, 0, 0],
-            [1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1],
             [0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0]]       
@@ -235,7 +235,6 @@ def draw_optimal_path(maze, start, goal):
 
     # convert maze into numpy array
     maze = np.array(maze)
-    print("Maze: \n", maze)
 
     # maze_solver 
     maze_solver = AStar_pathfinding(maze, start, goal)
@@ -248,7 +247,8 @@ def draw_optimal_path(maze, start, goal):
 
     # if solver can't reach goal position
     if path[0] == -1:
-        return -1
+        print("Solver can't find path")
+        return ['-1']
     
     # solver can reach the goal
     else:
@@ -277,7 +277,7 @@ def draw_optimal_path(maze, start, goal):
         maze[goal[0], goal[1]] = "G"
         print(maze)
 
-        return maze
+        return [maze, path]
 
         
 # TODO: read maze file and return matrix
@@ -286,18 +286,59 @@ def draw_optimal_path(maze, start, goal):
 def read_input_file(dir: str):
     pass
 
+
+
+def make_output (dir, maze, start, goal):
+    with open(dir, 'w') as f:
+
+        result = draw_optimal_path(maze, start, goal)
+
+
+        if result == ['-1']:
+            f.write('-1')
+            f.close()
+
+            return
+    
+
+        else:
+            
+            num_of_steps = len(result[1])
+            path = result[1]
+            maze = result[0]
+
+            # Convert path into tuple to export as string
+            path = tuple(map(tuple, path))
+
+            path_result = ""
+            for x in path:
+                path_result += str(x) + "  "
+
+            # Convert maze numpy array to export as string
+            temp = [" ".join(item) for item in maze.astype(str)]
+
+            maze_map = ""
+            for x in temp:
+                maze_map += x + "\n"
+
+
+            f.write(str(num_of_steps) + "\n")
+            f.write((path_result) + "\n")
+            f.write(maze_map)
+
+            f.close()
+
+
         
-
-
-
-
-
-
 
 
 # print(AStar_pathfinding(testMaze, [3, 4], [0, 1]))
 # AStar_pathfinding(testMaze, [0, 0], [9, 9])
 
 
-draw_optimal_path(testMaze, [3, 4], [0, 1])
+# result = draw_optimal_path(testMaze, [3, 4], [0, 1])
+
+make_output("output.txt", testMaze, [3, 4], [0, 1])
+
+
 
