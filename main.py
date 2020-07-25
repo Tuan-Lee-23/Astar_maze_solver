@@ -18,7 +18,7 @@ testMaze = [[1, 0, 0, 0, 0],
             [0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0]]
 
-testMaze = [[1, 0, 0, 0, 0, 0],
+testMaze = [[0, 0, 0, 0, 0, 0],
             [1, 1, 1, 1, 1, 0],
             [0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0],
@@ -37,9 +37,8 @@ testMaze = [[1, 0, 0, 0, 0, 0],
 #             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]] 
 
 
-testMaze = np.array(testMaze)
 
-print(testMaze)
+# print(testMaze)
 
 
 
@@ -105,6 +104,15 @@ def make_obstacles_list(maze):
     return list(map(list, zip(result[0], result[1])))
 
 
+# TODO: use A* algorithm to find optimal path in maze
+# @input: maze (numpy array), start (list), goal (list)
+# @output: 
+    # if goal is reached:    return [path, traversed]
+    #                       path: optimal ưay to finish a maze
+    #                       traversed: all of nodes have opened
+
+    # if can't reach the goal position:     return [[-1], traversed]
+    #                       traversed: all of nodes have opened
 
 def AStar_pathfinding(maze, start, goal):
     # initialize both open and closed list
@@ -159,11 +167,11 @@ def AStar_pathfinding(maze, start, goal):
             while current is not None:
                 path.append(current.position)
                 current = current.parent
-            print(path[::-1])
-            print("done")
-            print("Traversed: ", [x for x in traversed])
+            # print(path[::-1])
+            # print("done")
+            # print("Traversed: ", [x for x in traversed])
 
-            return
+            return [path[::-1], traversed]
         
         # Generate children of current node
         children = get_adjacent_indices(current.position, maze.shape)
@@ -213,15 +221,83 @@ def AStar_pathfinding(maze, start, goal):
 
             # Add the child to the open_set
             open_set.append(child)
-            print("append ", child.position)
-            print("Now: ", [x.position for x in open_set], end = '\n\n\n\n')
+            # print("append ", child.position)
+            # print("Now: ", [x.position for x in open_set], end = '\n\n\n\n')
+
+    # Reach here when open list is emtpy --> can't find path
+    return [[-1], traversed]
 
 
+# TODO: draw maze as text with optimal path
+# @input: maze (list), start: start position, goal: goal position
+# @output: numpy array
+def draw_optimal_path(maze, start, goal):
+
+    # convert maze into numpy array
+    maze = np.array(maze)
+    print("Maze: \n", maze)
+
+    # maze_solver 
+    maze_solver = AStar_pathfinding(maze, start, goal)
+
+    # Get optimal path
+    path = maze_solver[0]
+
+    # Get traversed
+    traversed = maze_solver[1]
+
+    # if solver can't reach goal position
+    if path[0] == -1:
+        return -1
+    
+    # solver can reach the goal
+    else:
+
+        # convert maze into string
+        maze = maze.astype('str')
+        
+        # print("path: ", path)
+        # print("traversed: ", traversed)
+
+        # Add obstacle as "o"
+        maze[maze == "1"] = "o"
+        
+        # Add free cells as "-"
+        maze[maze == "0"] = "-"
+        print(maze)
+
+        print("\n\nOptimal path ----------- ")
+        for cell in path:
+            x = cell[0]
+            y = cell[1]
+            maze[x, y] = "X"
+
+        # Add start and goal to output_maze
+        maze[start[0], start[1]] = "S"
+        maze[goal[0], goal[1]] = "G"
+        print(maze)
+
+        return maze
 
         
+# TODO: read maze file and return matrix
+# @input: file dir
+# @output: numpy array
+def read_input_file(dir: str):
+    pass
+
         
 
 
 
-AStar_pathfinding(testMaze, [3, 4], [0, 1])
+
+
+
+
+
+# print(AStar_pathfinding(testMaze, [3, 4], [0, 1]))
 # AStar_pathfinding(testMaze, [0, 0], [9, 9])
+
+
+draw_optimal_path(testMaze, [3, 4], [0, 1])
+
