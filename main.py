@@ -208,11 +208,15 @@ def AStar_pathfinding(maze, start, goal):
             open_node_g = [x.g for x in open_set]
             
             flag = 0
-            for x in open_node_g:
-                if child.g > x:
+            for x in open_set:
+                if child.g > x.g:
                     flag = 1
                     continue
-
+                elif child.g < x.g:
+                    adjacent_neighbor = get_adjacent_indices(child.position, maze.shape)
+                    if x.position in adjacent_neighbor:
+                        x.g = child.g + euclidean_distance(x.position, child.position)
+                        x.f = x.g + x.h
                         
             # If child not in open set
             if child.position in open_node_positions and flag == 1:
