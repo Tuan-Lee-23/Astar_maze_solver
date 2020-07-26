@@ -11,19 +11,18 @@ class Node():
         self.f = 0  # Sum: g + h
 
 
-
 # Create test maze
-testMaze = [[1, 0, 0, 0, 0],
-            [1, 1, 1, 1, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0]]
+# testMaze = [[1, 0, 0, 0, 0],
+#             [1, 1, 1, 1, 0],
+#             [0, 0, 0, 0, 0],
+#             [0, 0, 0, 0, 0],
+#             [0, 0, 0, 0, 0]]
 
-testMaze = [[0, 0, 0, 0, 0, 0],
-            [1, 1, 1, 1, 1, 1],
-            [0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0]]       
+# testMaze = [[0, 0, 0, 0, 0, 0],
+#             [1, 1, 1, 1, 1, 1],
+#             [0, 0, 0, 0, 0, 0],
+#             [0, 0, 0, 0, 0, 0],
+#             [0, 0, 0, 0, 0, 0]]       
 
 
 # testMaze = [[0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
@@ -36,10 +35,6 @@ testMaze = [[0, 0, 0, 0, 0, 0],
 #             [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
 #             [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
 #             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]] 
-
-
-
-# print(testMaze)
 
 
 
@@ -165,6 +160,9 @@ def AStar_pathfinding(maze, start, goal):
 
         # if Current is the goal position
         if current.position == goal.position:
+
+            print("\n\nTraversed: ")
+            print(traversed)
             path = []
             
             while current is not None:
@@ -272,17 +270,19 @@ def draw_optimal_path(maze, start, goal):
         # Add free cells as "-"
         maze[maze == "0"] = "-"
         print("\n\nSymbolize maze: \n")
+
+        maze[start[0], start[1]] = "S"
+        maze[goal[0], goal[1]] = "G"
+
         print(maze)
 
         print("\n\nOptimal path ----------- ")
-        for cell in path:
+        for cell in path[1:-1]:
             x = cell[0]
             y = cell[1]
             maze[x, y] = "X"
 
-        # Add start and goal to output_maze
-        maze[start[0], start[1]] = "S"
-        maze[goal[0], goal[1]] = "G"
+        # final maze
         print(maze)
 
         return [maze, path]
@@ -308,15 +308,18 @@ def read_input_file(dir: str):
                 
                 if i == 0:
                     maze_shape = line.strip()
-                    maze_shape = [int(maze_shape[0]), int(maze_shape[2])]
+                    maze_shape = maze_shape.split()
+                    maze_shape = [int(maze_shape[0]), int(maze_shape[1])]
 
                 elif i == 1:
                     start = line.strip()
-                    start = [int(start[0]), int(start[2])]
+                    start = start.split()
+                    start = [int(start[0]), int(start[1])]
 
                 elif i == 2:
                     goal = line.strip()
-                    goal = [int(goal[0]), int(goal[2])]
+                    goal = goal.split()
+                    goal = [int(goal[0]), int(goal[1])]
 
                 else:
                     row = line.strip()
@@ -331,7 +334,7 @@ def read_input_file(dir: str):
             print("Start: ", start)
             print("Goal: ", goal)
 
-            print("Maze read as input: ")
+            print("Input maze: ")
             
             print(maze)
 
@@ -385,19 +388,37 @@ def make_output (dir, maze, start, goal):
 
 
 
+# def main():
+
+#     input_data = read_input_file('input.txt')
+
+
+
+#     # Maze
+#     maze = input_data[0]
+#     start = input_data[1]
+#     goal = input_data[2]
+
+
+#     make_output('output.txt', maze, start, goal)
+
+
 def main():
 
-    input_data = read_input_file('input.txt')
+    arguments = sys.argv
 
+    input_file = arguments[1]
+    output_file = arguments[2]
 
+    input_data = read_input_file(input_file)
 
-    # Maze
+    # Get maze and start, goal position
     maze = input_data[0]
     start = input_data[1]
     goal = input_data[2]
 
+    make_output(output_file, maze, start, goal)
 
-    make_output('output.txt', maze, start, goal)
 
 
 if __name__ == '__main__':
