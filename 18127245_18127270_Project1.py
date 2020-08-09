@@ -1,11 +1,13 @@
 import numpy as np
 import sys
 import graphic as gp
+import datetime
+
 
 class Node():
-    def __init__(self, parent = None, position = None):
-        self.parent = parent # Node
-        self.position = position # list
+    def __init__(self, parent=None, position=None):
+        self.parent = parent  # Node
+        self.position = position  # list
 
         self.g = 0  # Distance from starting point (from parent)
         self.h = 0  # Distance from end point
@@ -38,7 +40,6 @@ class Node():
 #             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
 
 
-
 # TODO: calculate distance from starting node
 # @input: start_pos (list), goal_pos (list)
 def euclidean_distance(start_pos: list, goal_pos: list):
@@ -48,9 +49,10 @@ def euclidean_distance(start_pos: list, goal_pos: list):
     start_posX = start_pos[1]
     start_posY = start_pos[0]
 
-    distance = np.sqrt((goal_posX - start_posX)**2 + (goal_posY - start_posY) ** 2)
+    distance = np.sqrt((goal_posX - start_posX) ** 2 + (goal_posY - start_posY) ** 2)
 
     return distance
+
 
 # TODO: get adjacent nodes from current node
 # @input: current (Node), maze_shape (list)
@@ -68,7 +70,7 @@ def get_adjacent_indices(current, maze_shape, obstacle):
             adjacent_indices.append([i - 1, j - 1])
     # Up
     if i > 0:
-        adjacent_indices.append([i-1,j])
+        adjacent_indices.append([i - 1, j])
     if not ([i, j + 1] in obstacle and [i - 1, j] in obstacle):
         # up right
         if i > 0 and j + 1 < n:
@@ -103,19 +105,18 @@ def make_obstacles_list(maze):
 # TODO: use A* algorithm to find optimal path in maze
 # @input: maze (numpy array), start (list), goal (list)
 # @output:
-    # if goal is reached:    return [path (list), traversed (list)]
-    #                       path: optimal path to finish a maze
-    #                       traversed: all of nodes have opened
+# if goal is reached:    return [path (list), traversed (list)]
+#                       path: optimal path to finish a maze
+#                       traversed: all of nodes have opened
 
-    # if can't reach the goal position:     return [[-1], traversed]
-    #                       traversed: all of nodes have opened
+# if can't reach the goal position:     return [[-1], traversed]
+#                       traversed: all of nodes have opened
 
 def AStar_pathfinding(maze, start, goal):
     # initialize both open and closed list
-    open_set = [] # set of nodes to be evaluated
+    open_set = []  # set of nodes to be evaluated
 
-
-    traversed = [] # set of nodes already evaluated and visited (position)
+    traversed = []  # set of nodes already evaluated and visited (position)
 
     obstacle = make_obstacles_list(maze)
 
@@ -124,13 +125,10 @@ def AStar_pathfinding(maze, start, goal):
     start.f = 0
     goal = Node(None, goal)
 
-
     open_set.append(start)
-
 
     # Loop until fidn the end
     while len(open_set) > 0:
-
 
         # Get the current node and let it equal the node with smallest f value
         smallest = open_set[0]
@@ -144,17 +142,13 @@ def AStar_pathfinding(maze, start, goal):
         current = smallest
         # print("Current: ", current.position, "------------------------------------")
 
-
         # Add current node to traversed
         traversed.append(current.position)
 
         # print("Traversed: ", traversed)
 
-
         # remove current node from open_set
         open_set.remove(current)
-
-
 
         # if Current is the goal position
         if current.position == goal.position:
@@ -196,7 +190,6 @@ def AStar_pathfinding(maze, start, goal):
             child.g = current.g + euclidean_distance(child.position, current.position)
             # print("g: ", child.g)
 
-
             # TODO Distance from child to end
             child.h = euclidean_distance(child.position, goal.position)
             # print("h: ", child.h)
@@ -204,7 +197,6 @@ def AStar_pathfinding(maze, start, goal):
             child.f = child.g + child.h
 
             # print("f: ", child.f)
-
 
             open_node_positions = [x.position for x in open_set]
             open_node_g = [x.g for x in open_set]
@@ -224,8 +216,6 @@ def AStar_pathfinding(maze, start, goal):
             if child.position in open_node_positions and flag == 1:
                 continue
 
-
-
             # Add the child to the open_set
             open_set.append(child)
             # print("append ", child.position)
@@ -243,7 +233,6 @@ def AStar_pathfinding(maze, start, goal):
 # if solver can't reach goal
 #       @output: ['-1'] (list)
 def draw_optimal_path(maze, start, goal):
-
     # convert maze into numpy array
     maze = np.array(maze)
     # maze_solver
@@ -301,7 +290,6 @@ def draw_optimal_path(maze, start, goal):
 #           end: end position (list)
 
 def read_input_file(dir: str):
-
     try:
         with open(dir, 'r') as f:
             lines = f.readlines()
@@ -351,7 +339,7 @@ def read_input_file(dir: str):
 # TODO: receive maze and make output file
 # @input: dir: string, maze (list), start (list), goal (list)
 # @output: a text file
-def make_output (dir, maze, start, goal):
+def make_output(dir, maze, start, goal):
     with open(dir, 'w') as f:
         result = draw_optimal_path(maze, start, goal)
 
@@ -370,7 +358,7 @@ def make_output (dir, maze, start, goal):
             maze = result[0]
 
             # Convert path into tuple to export as string
-            path = tuple(map(tuple,path))
+            path = tuple(map(tuple, path))
 
             path_result = ""
             for x in path:
@@ -383,7 +371,6 @@ def make_output (dir, maze, start, goal):
             for x in temp:
                 maze_map += x + "\n"
 
-
             f.write(str(num_of_steps) + "\n")
             f.write((path_result) + "\n")
             f.write(maze_map)
@@ -391,14 +378,14 @@ def make_output (dir, maze, start, goal):
             f.close()
         return result[1], result[-1]
 
-def main():
 
+def main():
     arguments = sys.argv
 
     input_file = arguments[1]
     output_file = arguments[2]
-    #'/Users/macintoshhd/HOCDIIIII/AIProject1/Astar_maze_solving/masive_maze2.txt'
-    #'/Users/macintoshhd/HOCDIIIII/AIProject1/res.txt'  #
+    # '/Users/macintoshhd/HOCDIIIII/AIProject1/Astar_maze_solving/masive_maze2.txt'
+    # '/Users/macintoshhd/HOCDIIIII/AIProject1/res.txt'  #
     input_data = read_input_file(input_file)
 
     # Get maze and start, goal position
@@ -406,7 +393,10 @@ def main():
     start = input_data[1]
     goal = input_data[2]
 
+    begin_time = datetime.datetime.now()
     optimalPath, openPath = make_output(output_file, maze, start, goal)
+    print('Execute time ' + str(datetime.datetime.now() - begin_time))
+
     if optimalPath is not None and len(optimalPath) != 0:
         gp.addStart(start)
         gp.addGoal(goal)
@@ -415,11 +405,6 @@ def main():
         gp.addOptimalPath(optimalPath)
         gp.main()
 
+
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
