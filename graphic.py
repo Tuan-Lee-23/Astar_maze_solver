@@ -139,8 +139,8 @@ def main():
     done = False
     pygame.init()
 
-    w = 1900
-    h = 1000
+    w = 1280
+    h = 720
 
     wz = [len(map[0]) * SIZE + (len(map[0]) + 1 ) * MARGIN, len(map) * SIZE + (len(map) + 1 ) * MARGIN]
     if w < wz[0]:

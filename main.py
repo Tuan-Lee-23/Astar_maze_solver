@@ -142,7 +142,7 @@ def AStar_pathfinding(maze, start, goal):
         # print("Smallest node: ", smallest.position)
 
         current = smallest
-        print("Current: ", current.position, "------------------------------------")
+        # print("Current: ", current.position, "------------------------------------")
 
 
         # Add current node to traversed
