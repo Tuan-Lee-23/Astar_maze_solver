@@ -391,29 +391,14 @@ def make_output (dir, maze, start, goal):
             f.close()
         return result[1], result[-1]
 
-
-# def main():
-
-#     input_data = read_input_file('input.txt')
-
-
-
-#     # Maze
-#     maze = input_data[0]
-#     start = input_data[1]
-#     goal = input_data[2]
-
-
-#     make_output('output.txt', maze, start, goal)
-
-
 def main():
 
     arguments = sys.argv
 
-    input_file = '/Users/macintoshhd/HOCDIIIII/AIProject1/Astar_maze_solving/masive_maze.txt'#arguments[1]
-    output_file = '/Users/macintoshhd/HOCDIIIII/AIProject1/res.txt'#arguments[2]
-
+    input_file = arguments[1]
+    output_file = arguments[2]
+    #'/Users/macintoshhd/HOCDIIIII/AIProject1/Astar_maze_solving/masive_maze2.txt'
+    #'/Users/macintoshhd/HOCDIIIII/AIProject1/res.txt'  #
     input_data = read_input_file(input_file)
 
     # Get maze and start, goal position
@@ -429,10 +414,6 @@ def main():
         gp.addOpenPath(openPath)
         gp.addOptimalPath(optimalPath)
         gp.main()
-
-    # showUI(output_file)
-
-
 
 if __name__ == '__main__':
     main()
