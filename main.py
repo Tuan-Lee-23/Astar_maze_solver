@@ -57,42 +57,39 @@ def euclidean_distance(start_pos: list, goal_pos: list):
 #         current: current node,    maze: shape of maze (m, n)
 
 # Get neighbor of current node
-def get_adjacent_indices(current, maze_shape):
+def get_adjacent_indices(current, maze_shape, obstacle):
     m, n = maze_shape[0], maze_shape[1]
     i, j = current[0], current[1]
     adjacent_indices = []
 
     # up left
-    if i > 0 and j > 0:
-        adjacent_indices.append([i - 1, j - 1])
-
+    if not ([i, j - 1] in obstacle and [i + 1, j] in obstacle):
+        if i > 0 and j > 0:
+            adjacent_indices.append([i - 1, j - 1])
     # Up
     if i > 0:
         adjacent_indices.append([i-1,j])
-    
-    # up right
-    if i > 0 and j + 1 < n:
-        adjacent_indices.append([i - 1, j + 1])
-
+    if not ([i, j + 1] in obstacle and [i - 1, j] in obstacle):
+        # up right
+        if i > 0 and j + 1 < n:
+            adjacent_indices.append([i - 1, j + 1])
     # right
     if j + 1 < n:
-        adjacent_indices.append([i,j+1])
-
-    # down right
-    if j + 1 < n and i + 1 < m:
-        adjacent_indices.append([i + 1, j + 1])
-    
+        adjacent_indices.append([i, j + 1])
+    if not ([i, j + 1] in obstacle and [i + 1, j] in obstacle):
+        # down right
+        if j + 1 < n and i + 1 < m:
+            adjacent_indices.append([i + 1, j + 1])
     # down
     if i + 1 < m:
-        adjacent_indices.append([i+1,j])
-
-    # down left
-    if j > 0 and i + 1 < m:
-        adjacent_indices.append([i + 1, j - 1])
-
+        adjacent_indices.append([i + 1, j])
+    if not ([i, j - 1] in obstacle and [i - 1, j] in obstacle):
+        # down left
+        if j > 0 and i + 1 < m:
+            adjacent_indices.append([i + 1, j - 1])
     # left
     if j > 0:
-        adjacent_indices.append([i,j-1])
+        adjacent_indices.append([i, j - 1])
 
     return adjacent_indices
 
@@ -141,11 +138,11 @@ def AStar_pathfinding(maze, start, goal):
             if node.f < smallest.f:
                 smallest = node
 
-        print("\n\nOpen set: ", [x.position for x in open_set])
+        # print("\n\nOpen set: ", [x.position for x in open_set])
         # print("Smallest node: ", smallest.position)
 
         current = smallest
-        # print("Current: ", current.position, "------------------------------------")
+        print("Current: ", current.position, "------------------------------------")
 
 
         # Add current node to traversed
@@ -169,9 +166,9 @@ def AStar_pathfinding(maze, start, goal):
             notDone = 0
             while current is not None:
                 par = current.parent
-                if par != None and current.position[0] != par.position[0] and current.position[1] != par.position[1]:
-                    notDone = 1
-                    break
+                # if par != None and current.position[0] != par.position[0] and current.position[1] != par.position[1]:
+                #     notDone = 1
+                #     break
                 path.append(current.position)
                 current = par
             # print(path[::-1])
@@ -181,34 +178,32 @@ def AStar_pathfinding(maze, start, goal):
                 return [path[::-1], traversed]
 
         # Generate children of current node
-        children = get_adjacent_indices(current.position, maze.shape)
+        children = get_adjacent_indices(current.position, maze.shape, obstacle)
         # print("Children: ", children)
 
         children_nodes = [Node(current, child) for child in children]
 
         for child in children_nodes:
-            print("Child: ", child.position, "---------------------")
+            # print("Child: ", child.position, "---------------------")
 
             # TODO: continue if Child is on the traversed
             if child.position in obstacle or child.position in traversed:
-                continue
-            if child.position[0] != current.position[0] and child.position[1] != current.position[1]:
                 continue
 
             # TODO: Create f, g, h values
 
             # Distance from child to current
             child.g = current.g + euclidean_distance(child.position, current.position)
-            print("g: ", child.g)
+            # print("g: ", child.g)
 
 
             # TODO Distance from child to end
             child.h = euclidean_distance(child.position, goal.position)
-            print("h: ", child.h)
+            # print("h: ", child.h)
 
             child.f = child.g + child.h
 
-            print("f: ", child.f)
+            # print("f: ", child.f)
 
 
             open_node_positions = [x.position for x in open_set]
@@ -220,7 +215,7 @@ def AStar_pathfinding(maze, start, goal):
                     flag = 1
                     continue
                 elif child.g < x.g:
-                    adjacent_neighbor = get_adjacent_indices(child.position, maze.shape)
+                    adjacent_neighbor = get_adjacent_indices(child.position, maze.shape, obstacle)
                     if x.position in adjacent_neighbor:
                         x.g = child.g + euclidean_distance(x.position, child.position)
                         x.f = x.g + x.h
@@ -233,8 +228,8 @@ def AStar_pathfinding(maze, start, goal):
 
             # Add the child to the open_set
             open_set.append(child)
-            print("append ", child.position)
-            print("Now: ", [x.position for x in open_set], end = '\n\n\n\n')
+            # print("append ", child.position)
+            # print("Now: ", [x.position for x in open_set], end = '\n\n\n\n')
 
     # Reach here when open list is emtpy --> can't find path
     return [[-1], traversed]
@@ -365,7 +360,7 @@ def make_output (dir, maze, start, goal):
             f.write('-1')
             f.close()
 
-            return
+            return None, None
 
         # Found
         else:
@@ -416,7 +411,7 @@ def main():
 
     arguments = sys.argv
 
-    input_file = '/Users/macintoshhd/HOCDIIIII/AIProject1/big_maze.txt'#arguments[1]
+    input_file = '/Users/macintoshhd/HOCDIIIII/AIProject1/Astar_maze_solving/masive_maze.txt'#arguments[1]
     output_file = '/Users/macintoshhd/HOCDIIIII/AIProject1/res.txt'#arguments[2]
 
     input_data = read_input_file(input_file)
@@ -427,7 +422,7 @@ def main():
     goal = input_data[2]
 
     optimalPath, openPath = make_output(output_file, maze, start, goal)
-    if len(optimalPath) != 0:
+    if optimalPath is not None and len(optimalPath) != 0:
         gp.addStart(start)
         gp.addGoal(goal)
         gp.addMap(maze)

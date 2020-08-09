@@ -11,8 +11,7 @@ BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 
 # This sets the WIDTH and HEIGHT of each grid location
-WIDTH = 20
-HEIGHT = 20
+SIZE = 20
 
 # This sets the margin between each cell
 MARGIN = 5
@@ -93,8 +92,6 @@ def addGoal(point):
 def addMap(arr):
     global map
     map = arr
-    print("did add map")
-    print(map)
 
 def drawPath(array1):
     array = array1
@@ -131,16 +128,35 @@ def addOpenPath(path):
     global openPath
     openPath = path
 dd = 1
+
 def main():
     global dd
     global isOptimal
     global openPath
     global speed
+    global SIZE
+    global MARGIN
     done = False
     pygame.init()
 
+    w = 1900
+    h = 1000
+
+    wz = [len(map[0]) * SIZE + (len(map[0]) + 1 ) * MARGIN, len(map) * SIZE + (len(map) + 1 ) * MARGIN]
+    if w < wz[0]:
+        SIZE = int((w - (len(map[0]) + 1 ) * MARGIN) / len(map[0]))
+        MARGIN = int(SIZE / 4)
+        if MARGIN == 0:
+            MARGIN = 1
+        wz = [len(map[0]) * SIZE + (len(map[0]) + 1) * MARGIN, len(map) * SIZE + (len(map) + 1) * MARGIN]
+    if h < wz[1]:
+        SIZE = int((h - (len(map) + 1) * MARGIN) / len(map))
+        MARGIN = int(SIZE / 4)
+        if MARGIN == 0:
+            MARGIN = 1
+        wz = [len(map[0]) * SIZE + (len(map[0]) + 1) * MARGIN, len(map) * SIZE + (len(map) + 1) * MARGIN]
     # Set the HEIGHT and WIDTH of the screen
-    WINDOW_SIZE = [len(map[0]) * 20 + (len(map[0]) + 1 ) * 5, len(map) * 20 + (len(map) + 1 ) * 5]
+    WINDOW_SIZE = wz
     speed = 1.0/len(map)
     screen = pygame.display.set_mode(WINDOW_SIZE)
 
@@ -148,23 +164,17 @@ def main():
     pygame.display.set_caption("Array Backed Grid")
 
     while not done:
-        for event in pygame.event.get():  # User did something
-            if event.type == pygame.QUIT:  # If user clicked close
-                done = True  # Flag that we are done so we exit this loop
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # User clicks the mouse. Get the position
                 pos = pygame.mouse.get_pos()
-                # Change the x/y screen coordinates to grid coordinates
-                column = pos[0] // (WIDTH + MARGIN)
-                row = pos[1] // (HEIGHT + MARGIN)
-                # Set that location to one
-                grid[row][column] = 1
-                print("Click ", pos, "Grid coordinates: ", row, column)
+
 
         # Set the screen background
         screen.fill(BLACK)
         if dd == 1:
-            print("didDraw")
             drawPath(openPath)
             dd = 0
         # Draw the grid
@@ -176,39 +186,39 @@ def main():
                     color = BLACK
                 pygame.draw.rect(screen,
                                  color,
-                                 [(MARGIN + WIDTH) * column + MARGIN,
-                                  (MARGIN + HEIGHT) * row + MARGIN,
-                                  WIDTH,
-                                  HEIGHT])
+                                 [(MARGIN + SIZE) * column + MARGIN,
+                                  (MARGIN + SIZE) * row + MARGIN,
+                                  SIZE,
+                                  SIZE])
         for item in drawArray:
             color = GREEN
             pygame.draw.rect(screen,
                              color,
-                             [(MARGIN + WIDTH) * item[1] + MARGIN,
-                              (MARGIN + HEIGHT) * item[0] + MARGIN,
-                              WIDTH,
-                              HEIGHT])
+                             [(MARGIN + SIZE) * item[1] + MARGIN,
+                              (MARGIN + SIZE) * item[0] + MARGIN,
+                              SIZE,
+                              SIZE])
         if isOptimal:
             for item in optimalPathForDraw:
                 color = RED
                 pygame.draw.rect(screen,
                                  color,
-                                 [(MARGIN + WIDTH) * item[1] + MARGIN,
-                                  (MARGIN + HEIGHT) * item[0] + MARGIN,
-                                  WIDTH,
-                                  HEIGHT])
+                                 [(MARGIN + SIZE) * item[1] + MARGIN,
+                                  (MARGIN + SIZE) * item[0] + MARGIN,
+                                  SIZE,
+                                  SIZE])
         pygame.draw.rect(screen,
                          BLUE,
-                         [(MARGIN + WIDTH) * start[1] + MARGIN,
-                          (MARGIN + HEIGHT) * start[0] + MARGIN,
-                          WIDTH,
-                          HEIGHT])
+                         [(MARGIN + SIZE) * start[1] + MARGIN,
+                          (MARGIN + SIZE) * start[0] + MARGIN,
+                          SIZE,
+                          SIZE])
         pygame.draw.rect(screen,
                          YELLOW,
-                         [(MARGIN + WIDTH) * goal[1] + MARGIN,
-                          (MARGIN + HEIGHT) * goal[0] + MARGIN,
-                          WIDTH,
-                          HEIGHT])
+                         [(MARGIN + SIZE) * goal[1] + MARGIN,
+                          (MARGIN + SIZE) * goal[0] + MARGIN,
+                          SIZE,
+                          SIZE])
         # Limit to 60 frames per second
         clock.tick(60)
 
