@@ -384,8 +384,7 @@ def main():
 
     input_file = arguments[1]
     output_file = arguments[2]
-    # '/Users/macintoshhd/HOCDIIIII/AIProject1/Astar_maze_solving/masive_maze2.txt'
-    # '/Users/macintoshhd/HOCDIIIII/AIProject1/res.txt'  #
+
     input_data = read_input_file(input_file)
 
     # Get maze and start, goal position
